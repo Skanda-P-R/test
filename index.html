@@ -1,195 +1,431 @@
-<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Space Shooter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>NGO Website Project</title>
 <style>
-  body {
-    margin: 0;
-    background: black;
-    overflow: hidden;
-    touch-action: none;
+  .button {
+    backface-visibility: hidden;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  background: #ffa500;
+  border-radius: 020px;
+  border: 1px solid #ffa500;
+  border-width: 1px 1px 1px 1px;
+  padding: 10px 20px 10px 20px;
+  box-shadow: inset 0px 1px 0px rgba(255,255,255,1),0px 1px 3px rgba(0,0,0,0.3);
+    color: #ffffff;
+  font-size: 25px;
+  font-family: Helvetica Neue;
+  font-weight: 900;
+  font-style: normal;
+  text-shadow: 0px -1px 0px rgba(0,0,0,0.4)
+  }
+  .button > div {
+    color: #999;
+  font-size: 10px;
+  font-family: Helvetica Neue;
+  font-weight: initial;
+  font-style: normal;
+  text-align: center;
+  margin: 0px 0px 0px 0px
+  }
+  .button > i {
+    font-size: 1em;
+  border-radius: 0px;
+  border: 0px solid transparent;
+  border-width: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+  position: static
+  }
+  .button > .ld {
+    font-size: initial
   }
 
-  canvas {
-    display: block;
-  }
 
-  #controller {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;
-    background: #222;
-    border-top: 2px solid #555;
-  }
+.b {
+display: inline-block;
+text-decoration: none;
+padding: 8px 15px;
+border: 2px solid transparent;
+border-radius: 20px;
+margin: 5px;
+color: white;
+background-color: orange;
 
-  #thumb {
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    width: 50px;
-    height: 50px;
-    background: #aaa;
-    border-radius: 50%;
-    transform: translateX(-50%);
-  }
-</style>
+}
+.menu-row:hover a {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 1);
+  border-color: white;
+  background-color: #FC6A03;}
+.bf{
+   font-family: Garamond, serif;
+   font-weight: bold;
+   color: white;
+   font-size: 28;
+}
+</style> 
 </head>
-<body>
+<body bgcolor="#fefefa">
+<table  width="100%" height="100" bgcolor="#03AC13" cellspacing="5" cellpadding="5">
+<tr>
+<td align="center"><img src="icon.jpg" width="120" height="100" style="border-radius:30px;"><font size="10" color="white" style="font-family: Garamond, serif;"><strong>&nbsp;&nbsp;&nbsp;GRAMEENA UNNATHI SOCIETY</strong></font></td>
+</tr></table>
+<a id="home"></a><table width="100%" height="70" bgcolor="Orange" cellspacing="5" cellpadding="5">
+<tr>
+<td align="center">
+<table width="100%" align="center">
+<tr>
+  <td align="center" class="menu-row"><font class="bf"><h3>&nbsp;&nbsp;&nbsp;</h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#home" class="b">Home</a></h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#about" class="b">About</a></h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#missions" class="b">Missions</a></h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#achievements" class="b">Achievements</a></h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#kpersons" class="b">Key Persons</a></h3></font></td>
+  <td align="center" class="menu-row"><font class="bf"><h3><a href="#contact" class="b">Contact</a></h3></font></td>
+</tr>
 
-<canvas id="game"></canvas>
 
-<div id="controller">
-  <div id="thumb"></div>
+</table>
+</td>
+</tr>
+</table>
+
+<br><div id="imageContainer" align="center">
+  <img src="img1.jpeg" alt="Image 1" width="400" height="500"/>
+
 </div>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+  // List of image URLs to cycle through
+  const imageUrls = [
+    "img1.jpeg",
+    "img2.jpeg",
+    "img3.jpeg",
+"img4.jpeg",
+"img5.jpeg",
+"img6.jpeg",
+"img8.jpeg",
+"img11.jpeg",
+"img12.jpeg",
+"img13.jpeg"
+            ];
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 80;
-}
-resize();
-window.addEventListener("resize", resize);
+  let currentIndex = 0;
+  const imageContainer = document.getElementById("imageContainer");
+  const imgElement = imageContainer.querySelector("img");
 
-/* ---------- PLAYER ---------- */
-const player = {
-  x: canvas.width / 2,
-  y: canvas.height - 60,
-  width: 40,
-  height: 40
-};
+  function changeImage() {
+    imgElement.src = imageUrls[currentIndex];
+    currentIndex = (currentIndex + 1) % imageUrls.length;
+  }
 
-/* ---------- BULLETS ---------- */
-let bullets = [];
-let enemies = [];
-let score = 0;
-
-/* ---------- CONTROL ---------- */
-const controller = document.getElementById("controller");
-const thumb = document.getElementById("thumb");
-let dragging = false;
-
-function moveThumb(clientX) {
-  const rect = controller.getBoundingClientRect();
-  let x = clientX - rect.left;
-  x = Math.max(25, Math.min(rect.width - 25, x));
-  thumb.style.left = x + "px";
-
-  // Map thumb position to player position
-  const ratio = x / rect.width;
-  player.x = ratio * canvas.width;
-}
-
-thumb.addEventListener("mousedown", e => {
-  dragging = true;
-});
-window.addEventListener("mouseup", () => dragging = false);
-window.addEventListener("mousemove", e => {
-  if (dragging) moveThumb(e.clientX);
-});
-
-thumb.addEventListener("touchstart", e => {
-  dragging = true;
-});
-window.addEventListener("touchend", () => dragging = false);
-window.addEventListener("touchmove", e => {
-  if (dragging) moveThumb(e.touches[0].clientX);
-});
-
-/* ---------- GAME LOGIC ---------- */
-function shoot() {
-  bullets.push({
-    x: player.x,
-    y: player.y
-  });
-}
-
-setInterval(shoot, 300);
-
-function spawnEnemy() {
-  enemies.push({
-    x: Math.random() * (canvas.width - 40) + 20,
-    y: -40,
-    size: 30
-  });
-}
-
-setInterval(spawnEnemy, 800);
-
-/* ---------- UPDATE ---------- */
-function update() {
-  bullets.forEach(b => b.y -= 7);
-  bullets = bullets.filter(b => b.y > 0);
-
-  enemies.forEach(e => e.y += 2);
-
-  // Collision
-  enemies.forEach((e, ei) => {
-    bullets.forEach((b, bi) => {
-      if (
-        b.x > e.x - e.size &&
-        b.x < e.x + e.size &&
-        b.y > e.y - e.size &&
-        b.y < e.y + e.size
-      ) {
-        enemies.splice(ei, 1);
-        bullets.splice(bi, 1);
-        score++;
-      }
-    });
-  });
-}
-
-/* ---------- DRAW ---------- */
-function drawPlayer() {
-  ctx.fillStyle = "#00f";
-  ctx.beginPath();
-  ctx.moveTo(player.x, player.y);
-  ctx.lineTo(player.x - 20, player.y + 40);
-  ctx.lineTo(player.x + 20, player.y + 40);
-  ctx.closePath();
-  ctx.fill();
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Bullets
-  ctx.fillStyle = "yellow";
-  bullets.forEach(b => {
-    ctx.fillRect(b.x - 2, b.y, 4, 10);
-  });
-
-  // Enemies
-  ctx.fillStyle = "red";
-  enemies.forEach(e => {
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  drawPlayer();
-
-  // Score
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("Score: " + score, 10, 30);
-}
-
-/* ---------- LOOP ---------- */
-function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-
-loop();
+  // Call the changeImage function every 10 seconds
+  setInterval(changeImage, 1000); // 10 seconds = 10000 milliseconds
 </script>
+
+
+<table width="100%" height="82" cellspacing="5" cellpadding="5">
+<tr><td align="center"><font size="11" color="#03AC13" style="font-family: Garamond, serif;">THE COUNTRIFIED LIGHTS</font></td></tr>
+<tr><th align="center"><font size="12">Dream. Plan. Implement.</font></th></tr></table>
+<table width="100%" height="82" cellspacing="5" cellpadding="5">
+<tr><td align="center"><table>
+<tr><td align="center"><button class="button"><a href="#contact">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Contact Us!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></button>
+</td></tr>
+   </table>
+</td>
+</tr>
+</table>
+
+<a id="about"></a><section class="text-black-600 body-font overflow-hidden">
+  <div class="container px-5 py-24 mx-auto">
+    <div class="-my-8 divide-y-2 divide-black-100">
+      <div class="py-8 flex flex-wrap md:flex-nowrap">
+        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
+          <span class="font-semibold title-font text-black-700"><h1>ABOUT US</h1></span>
+          <span class="mt-1 text-black-500 text-sm"></span>
+        </div>
+        <div class="md:flex-grow">
+          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2"></h2>
+		  <p class="leading-relaxed">Gramina Unnati is a society dedicated to providing professional support for projects in  agriculture with special emphasis on organic cultivation, <a id="services"></a>agri businesses  and rural upliftment.
+</p>
+        </div>
+      </div>
+      <div class="py-8 flex flex-wrap md:flex-nowrap">
+        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
+          <span class="font-semibold title-font text-gray-700"><h1>SERVICES</h1></span>
+          <span class="mt-1 text-gray-500 text-sm"></span>
+        </div>
+        <div class="md:flex-grow">
+          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2"></h2>
+          <p class="leading-relaxed">- Organic farming- Management, Training & Demonstration<br>
+- Certification Services (PGS, NPOP, GAP, etc)<br>
+- Formation of FIGs, & FPOs, and mentor them to achieve self-sustainability<br>
+- Farm Planning and Post harvest management advisory<br>
+- Advising on end-to-end value chain integration of agri ventures<br>
+- Marketing linkage with buyers.<br>
+- Financial Advisory for farmers to improve their financial stability.<br>
+- Advising on Agri business ventures.<br>
+
+</p>
+        </div>
+      </div>
+      <div class="py-8 flex flex-wrap md:flex-nowrap">
+        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
+          <span class="font-semibold title-font text-gray-700">MISSIONS</span>
+          <span class="text-sm text-gray-500"></span>
+        </div>
+        <div class="md:flex-grow">
+          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2"></h2>
+          <p class="leading-relaxed">- Promote organic cultivation of food articles<br>
+- Provide Farm-to-Market solutions for agri-ventures<br>
+- Empowering rural communities   <br>
+</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<a id="achievements"></a>
+<span class="ml-3 text-xl"><h1 align="center"><b>ACHIEVEMENTS:</b></h1></span>
+<section class="text-gray-600 body-font">
+  <div class="container px-5 py-24 mx-auto">
+    <div class="flex flex-wrap -m-4">
+      <!-- Box 1 -->
+      <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+         
+         
+          <p class="leading-relaxed mb-3">Gramina Unnati has been associated with Big Basket, a TATA venture to assist in getting organic certification for farmer groups in consortium with  Reliable Organic Certification Agency Bangalore.</p>
+         
+     
+        </div>
+      </div>
+ 
+  <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+         
+          <p class="leading-relaxed mb-3">Undertaken Training programme for members of FPO based in Chikkaballapur for venturing into Organic farming</p>
+         
+         
+        </div>
+      </div>
+ 
+ <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+          <p class="leading-relaxed mb-3">Associated with the Organic supply chain and retailing company o of Biju to secure the supply of organic produces from a group of farmers</p>
+         
+        </div>
+      </div>
+ 
+ 
+ <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+         
+          <p class="leading-relaxed mb-3">Associated with AMAZON  for organic products segment development including establishing a back-end supply chain with farmers' groups in the state of Maharashtra state for meeting the compliance requirement </p>
+         
+        </div>
+      </div>
+ 
+ <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+         
+          <p class="leading-relaxed mb-3">Assisting well-known organic FPO of Nelamangala to establish production and grading protocol at the farmer level to help them to improve the quality and compliance. Also helped them to onboard for certifications.</p>
+         
+        </div>
+      </div>
+ 
+ 
+  <div class="p-4 lg:w-1/3">
+        <div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <!-- Replace the content for Box 1 -->
+          <!-- Example content -->
+         
+          <p class="leading-relaxed mb-3">Hand hold formation of “Bangalore Store” in London to cater to EU and UK market for FPOs of Karnataka.</p>
+         
+        </div>
+      </div>
+</section>
+<a id="kpersons"></a>
+<span class="ml-3 text-xl"><h1 align="center"><b>KEY PERSONS:</b></h1></span>
+
+
+
+<section class="text-gray-600 body-font">
+  <div class="container px-0 py-20 mx-auto flex flex-col">
+    <div class=" mx-auto">
+
+      <div class="flex flex-col sm:flex-row mt-4">
+        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
+
+          <div class="flex flex-col items-center text-center justify-center"><div class="h-full bg-orange-300 bg-opacity-75 px-16 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+
+  <img src="Kantharaj.jpeg" alt="Mr R Kantharaj" class="w-20 h-20 rounded-full inline-flex items-center justify-center bg-gray-200 text-gray-400">
+  <h2 class="font-medium title-font mt-4 text-gray-900 text-lg">Mr R Kantharaj</h2>
+  <p class="text-base">FOUNDER<br>GRAMMEENA UNNATHI SOCIETY</p>
+</div></div>
+        </div>
+        <div class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-500 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"><div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <p class="leading-relaxed text-lg mb-4">Mr R Kantharaj, a renowned name in organic farming promotion and has been striving to promote organic certifications, farmer enrolment and training for the last three decades.  He was the founder, director and member of a few organisations where they have rendered yeoman service to promote the cause of organic farming. In recent years he devoted himself to promote the FPO formation in the sates of Karnataka, Telangana , Uttar Pradesh, Jarkhand etc</p></div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class=" mx-auto">
+
+      <div class="flex flex-col sm:flex-row mt-4">
+        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
+
+          <div class="flex flex-col items-center text-center justify-center"><div class="h-full bg-orange-300 bg-opacity-75 px-16 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+ <img src="Sunitha.jpeg" alt="SUNITHA H R" class="w-20 h-20 rounded-full inline-flex items-center justify-center bg-gray-200 text-gray-400">
+            <h2 class="font-medium title-font mt-4 text-gray-900 text-lg">SUNITHA H R </h2>
+            <p class="text-base">CO-FOUNDER<br>GRAMMEENA UNNATHI SOCIETY</p>
+          </div>
+        </div></div>
+        <div class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-500 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"><div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <p class="leading-relaxed text-lg mb-4">Sunitha is a graduate of Business Management and had a successful stint in a management consulting company. She acquired expertise in corporate planning, financial management, supply chain management, production planning & control and business strategy. Thereafter she has been associated with promotion of organic certification and formation of FPOs in the leadership role. Having worked in these areas and being hailed from rural community, she co- founded this institution.</p></div>
+
+        </div>
+      </div>
+    </div>
+ 
+    <div class=" mx-auto">
+
+      <div class="flex flex-col sm:flex-row mt-4">
+        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
+
+          <div class="flex flex-col items-center text-center justify-center"><div class="h-full bg-orange-300 bg-opacity-75 px-24 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+ <img src="Anil kumar shetty.jpeg" alt="ANIL KUMAR SHETTY" class="w-20 h-20 rounded-full inline-flex items-center justify-center bg-gray-200 text-gray-400">
+            <h2 class="font-medium title-font mt-4 text-gray-900 text-lg">ANIL KUMAR SHETTY</h2>
+            <p class="text-base">FOUNDER<br>GSMEAdvisors</p>
+          </div>
+        </div></div>
+        <div class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-500 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"><div class="h-full bg-green-300 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+          <p class="leading-relaxed text-lg mb-4">Anil is a Financial specialist with broad experience in the areas of Investment Banking, Corporate Finance, Financial Management & Risk Advisory. He has direct experience with VC/PE, SME and Agri-business, Financial Consulting, and Risk Management. He founded www.smeadvisors.in</p></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<a id="contact"></a><section class="text-gray-600 body-font relative">
+  <div class="container px-5 py-20 mx-auto flex sm:flex-nowrap flex-wrap">
+
+    <div class="lg:w-2/3 md:w-1/2 bg-gray-300 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative">
+      <iframe width="100%" height="100%" class="absolute inset-0" frameborder="0" title="map" marginheight="0" marginwidth="0" scrolling="no" src="https://maps.google.com/maps?width=100%&amp;height=600&amp;hl=en&amp;q=Bangalore&amp;ie=UTF8&amp;t=&amp;z=14&amp;iwloc=B&amp;output=embed" style="filter: grayscale(0) contrast(1.2) opacity(0.9);"></iframe>
+      <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
+        <div class="lg:w-1/2 px-6">
+          <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">ADDRESS</h2>
+          <p class="mt-1">Micro Excel Plaza, No 72, 80 Feet Road, Sanjay Nagar, Bangalore – 560094</p>
+        </div>
+        <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
+          <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">EMAIL</h2>
+          <a class="text-indigo-500 leading-relaxed">info@grameenaunnathi.in </a>
+          <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">PHONE</h2>
+          <p class="leading-relaxed">7259220496</p>
+        </div>
+      </div>
+    </div>
+    <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
+  <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">CONTACT US</h2>
+  <p class="leading-relaxed mb-5 text-gray-600"></p>
+  <form onsubmit="return validateForm()"  action="submitted.php" method="post">
+    <div class="relative mb-4">
+      <label for="name" class="leading-7 text-sm text-gray-600">Name</label>
+      <input type="text" id="name" name="name" class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+      <span id="nameError" class="text-xs text-red-500 hidden">Please fill this field.</span>
+    </div>
+    <div class="relative mb-4">
+      <label for="email" class="leading-7 text-sm text-gray-600">Email</label>
+      <input type="email" id="email" name="email" class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+      <span id="emailError" class="text-xs text-red-500 hidden">Please fill this field.</span>
+    </div>
+    <div class="relative mb-4">
+      <label for="message" class="leading-7 text-sm text-gray-600">Message</label>
+      <textarea id="message" name="message" class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+    </div>
+<div class="flex justify-center"> <!-- Center aligns the submit button -->
+  <button type="submit" class="text-white bg-orange-500 border-0 py-2 px-20 focus:outline-none hover:bg-orange-600 rounded text-lg">Submit</button>
+</div>
+  </form>
+  <p class="text-xs text-gray-500 mt-3">.</p>
+</div>
+
+<script>
+function validateForm() {
+  var name = document.getElementById("name").value;
+  var email = document.getElementById("email").value;
+
+  if (name === "") {
+    document.getElementById("nameError").classList.remove("hidden");
+  } else {
+    document.getElementById("nameError").classList.add("hidden");
+  }
+
+  if (email === "") {
+    document.getElementById("emailError").classList.remove("hidden");
+  } else {
+    document.getElementById("emailError").classList.add("hidden");
+  }
+
+  if (name === "" || email === "") {
+    return false;
+  }
+}
+</script>
+
+  </div>
+</section>
+
+<footer class="text-gray-600 body-font">
+  <div class="bg-gray-100">
+    <div class="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
+      <p class="text-gray-500 text-sm text-center sm:text-left">© Team 10 - SSD
+      </p>
+      <span class="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
+        <a class="text-gray-500">
+          <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
+            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+          </svg>
+        </a>
+        <a class="ml-3 text-gray-500">
+          <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
+            <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
+          </svg>
+        </a>
+        <a class="ml-3 text-gray-500">
+          <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
+            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
+          </svg>
+        </a>
+        <a class="ml-3 text-gray-500">
+          <svg fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" class="w-5 h-5" viewBox="0 0 24 24">
+            <path stroke="none" d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+            <circle cx="4" cy="4" r="2" stroke="none"></circle>
+          </svg>
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
